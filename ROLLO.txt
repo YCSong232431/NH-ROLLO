@@ -1,0 +1,257 @@
+
+def random_small_vec_gen(n,t):
+    B = matrix(Fqm.base_ring(),t,m,0)
+    while B.rank() != t:
+        B = matrix(Fqm.base_ring(),[vector(Fqm.random_element()) for i in range(t)])
+    C = matrix(Fqm.base_ring(),n,m,0)
+    while C.rank() != t:
+        C = matrix(Fqm.base_ring(),n,t,[Fqm.base_ring().random_element() for _ in range(n*t)]) * B
+    return vector(Fqm,[C[i] for i in range(n)])
+
+def vector_matrix(small_vector): 
+    length = len(list(small_vector))
+    return matrix(Fqm.base_ring(),length,m,[vector(small_vector[j]) for j in range(length)])
+
+def R_to_Matrix(z):
+    return matrix(Fqm.base_ring(),n,m,[vector(z[i]) for i in range(n)])
+
+def rank_R(z):
+    return R_to_Matrix(z).rank()
+
+def ideal_matrix(v): 
+    list1 = []
+    for i in range(n/2):
+        c1 = list(X**i * v)
+        list1.append(c1)
+    return matrix(n/2,n/2,list1)
+
+def H_to_basis_list(B):
+    b = vector(B)
+    c = B.nrows() * B.ncols()
+    BB =  matrix(Fqm.base_ring(),c,m,[vector(b[j]) for j in range(c)]).row_space().basis_matrix()
+    return [Fqm(x) for x in BB.rows()]
+
+def vector_matrix(small_vector): 
+    length = len(list(small_vector))
+    return matrix(Fqm.base_ring(),length,m,[vector(small_vector[j]) for j in range(length)])
+
+def vector_space(small_vector): 
+    return vector_matrix(small_vector).row_space()
+
+def vector_to_basis_list(small_vector): 
+    return [Fqm(x) for x in vector_space(small_vector).basis_matrix().rows()]
+
+def basis_list_to_basis_matrix(b):
+    return vector_space(b).basis_matrix() 
+
+def basis_matrix_to_list(B):
+    return [Fqm(x) for x in B.rows()]
+
+def basis_product_of_two_space(basis_list1,basis_list2):
+    product_list = []
+    for i in range(len(basis_list1)): 
+        for j in range(len(basis_list2)):
+            product_list.append(basis_list1[i] * basis_list2[j])
+    return product_list
+
+# find support E
+def find_E(S_list, F_list):
+    tmp = matrix(Fqm.base_ring(),[vector(Fqm.gen()**i) for i in range(m)]).row_space()
+    for Fi in F_list:
+        FSi_list = [(1/Fi)*i for i in S_list]
+        SSBi = matrix(Fqm.base_ring(),[vector(i) for i in FSi_list])
+        tmp = tmp.intersection(SSBi.row_space())
+    return tmp
+
+----------------------------------------------------------------------------------------------
+
+# ROLLO-I 
+
+#(q,m,n,k,r,d) = (2,67,166,83,7,8)   # ROLLO-I-128
+#(q,m,n,k,r,d) = (2,79,194,97,8,8)   # ROLLO-I-192
+#(q,m,n,k,r,d) = (2,97,226,113,9,9)   # ROLLO-I-256
+#(q,m,n,k,r,d) = (2,83,194,97,8,8)   # Updated ROLLO-I-192
+
+import hashlib
+Fqm = GF(q^m)
+P1  = GF(q)['XX'].irreducible_element(n/2, algorithm="minimal_weight")
+P.<XX> = Fqm[]
+R.<X> = P.quotient(P1)
+
+# Key Generation
+def ROLLOI_KGen(q,m,n,k,r,d):
+    x_y = list(random_small_vec_gen(n,d))
+    x = R(x_y[0:k])
+    y = R(x_y[k:n])
+    h = x**(-1) * y
+    return x,y,h
+
+%time Key_List = ROLLOI_KGen(q,m,n,k,r,d)
+
+
+def ROLLOI_Encap(q,m,n,k,r,d,Public_Key):
+    e = list(random_small_vec_gen(n,r))
+    e1 = R(e[0:k])
+    e2 = R(e[k:n])
+    E = vector_space(e)
+    E_string = "".join(map(str,list(E.basis_matrix())))
+    c = e1 + Public_Key * e2
+    return c,hashlib.sha256(E_string.encode("utf-8")).hexdigest()
+
+Public_Key = Key_List[2]
+%time Encapsulation_Key_List = ROLLOI_Encap(q,m,n,k,r,d,Public_Key)
+
+
+def ROLLOI_Decap(q,m,n,k,r,d,Private_Key,Ciphertext):  
+    #H1 = ideal_matrix(Private_key[0]).transpose()
+    #H2 = ideal_matrix(Private_key[1]).transpose()
+    #H = block_matrix(1,2,[H1,H2])
+    #F_list = H_to_basis_list(H1)
+    xlist = list(Private_Key[0])
+    F_list = vector_to_basis_list(xlist)
+    slist = list(Private_Key[0]*Ciphertext)
+    S_list = vector_to_basis_list(slist)
+    E_test = find_E(S_list,F_list)
+    E_test_string = "".join(map(str,list(E_test.basis_matrix())))
+    return hashlib.sha256(E_test_string.encode("utf-8")).hexdigest()
+
+Private_Key = Key_List[0:2]; Ciphertext = Encapsulation_Key_List[0]
+%time Key_E_test = ROLLOI_Decap(q,m,n,k,r,d,Private_Key,Ciphertext)
+
+# check correctness
+Key_E_test == Encapsulation_Key_List[1]
+
+-----------------------------------------------------------------------
+
+# ROLLO-II 
+
+import hashlib
+
+# ROLLO-II 
+#(q,m,n,k,r,d)= (2,83,2*189,189,7,8) #  128  
+#(q,m,n,k,r,d)=(2,97,2*193,193,8,8) #  192
+#(q,m,n,k,r,d)=(2,97,2*211,211,8,9) #  256
+
+# Updated ROLLO-II 
+#(q,m,n,k,r,d)= (2,89,2*191,191,7,9) #  128  
+#(q,m,n,k,r,d)=(2,101,2*191,191,7,9) #  192
+#(q,m,n,k,r,d)=(2,97,2*211,211,7,11) #  256
+
+# 将十六进制哈希值转化成二进制字符串，比 “b1 = bin(int(Hex_str,16))[2:] ” 转化的更准确
+def Hexadecimal_to_Binary(Hex_str): 
+    bin_str = ""
+    for i in Hex_str:
+        bin_str += bin(int(i,16))[2:].zfill(4)
+    return bin_str
+
+Fqm = GF(q^m)
+P1  = GF(q)['XX'].irreducible_element(k, algorithm="minimal_weight")
+P.<XX> = Fqm[]
+R.<X> = P.quotient(P1)
+
+digest = hashlib.sha256().hexdigest()
+lamda = len(Hexadecimal_to_Binary(digest)) # 计算 hashlib.sha256() 的输出长度
+
+
+# Key Generation
+def ROLLOII_KGen(q,m,n,k,r,d):
+    x_y = list(random_small_vec_gen(n,d))
+    x = R(x_y[0:k])
+    y = R(x_y[k:n])
+    h = x**(-1) * y
+    return x,y,h
+
+%time Key_List = ROLLOII_KGen(q,m,n,k,r,d)
+
+def ROLLOII_Enc(q,m,n,k,r,d,Public_Key,Message):
+    e = list(random_small_vec_gen(n,r))
+    e1 = R(e[0:k])
+    e2 = R(e[k:n])
+    E = vector_space(e)
+    E_string = "".join(map(str,list(E.basis_matrix())))
+    c = e1 + Public_Key * e2
+    hash1 = hashlib.sha256(E_string.encode()).hexdigest()
+    b1 = Hexadecimal_to_Binary(hash1)
+    #b1 = bin(int(hash1,16))[2:]  # [2:]删去二进制串前面的0b,删去后是长度256比特的二进制串
+    b1_list = [Fqm(b1[i]) for i in range(lamda)]
+    return c,vector(Fqm.base_ring(),b1_list) + Message
+
+Public_Key = Key_List[2]; Message = random_vector(Fqm.base_ring(),lamda)
+%time Ciphertext_List = ROLLOII_Enc(q,m,n,k,r,d,Public_Key,Message)
+
+
+def ROLLOII_Dec(q,m,n,k,r,d,Private_Key,Ciphertext):  
+    xlist = list(Private_Key[0])
+    F_list = vector_to_basis_list(xlist)
+    slist = list(Private_Key[0]*Ciphertext[0])
+    S_list = vector_to_basis_list(slist)
+    E_test = find_E(S_list,F_list)
+    E_test_string = "".join(map(str,list(E_test.basis_matrix())))
+    hash2 = hashlib.sha256(E_test_string.encode()).hexdigest()
+    b2 = Hexadecimal_to_Binary(hash2)
+    #b2 = bin(int(hash2,16))[2:]
+    b2_list = [Fqm(b2[i]) for i in range(lamda)]
+    return vector(Fqm.base_ring(),b2_list) + Ciphertext[1]
+
+Private_Key = Key_List[0:2]; Ciphertext = Ciphertext_List
+%time Message_test = ROLLOII_Dec(q,m,n,k,r,d,Private_Key,Ciphertext)
+
+# Check Correctness
+Message_test == Message
+
+----------------------------------------------------------------------
+
+
+# ROLLO-III
+
+#(q,m,n,k,r,d) = (2,67,3*83,83,7,7) # ROLLO-III-128
+#(q,m,n,k,r,d) = (2,107,3*113,113,9,9) # ROLLO-III-192
+#(q,m,n,k,r,d) = (2,149,3*151,151,11,11) # ROLLO-III-256
+
+
+Fqm = GF(q^m)
+P1  = GF(q)['XX'].irreducible_element(k, algorithm="minimal_weight")
+P.<XX> = Fqm[]
+R.<X> = P.quotient(P1)
+
+# Key Generation
+def ROLLOIII_KGen(q,m,n,k,r,d):
+    f1 = R.random_element()
+    h1_h2 = list(random_small_vec_gen(2*k,d))
+    h0 = R(h1_h2[0:k])
+    h1 = R(h1_h2[k:2*k])
+    f0 = h1 + h0*f1
+    return h0,h1,f0,f1
+
+%time Key_List = ROLLOIII_KGen(q,m,n,k,r,d)
+
+
+def ROLLOIII_Encap(q,m,n,k,r,d,Public_Key):
+    ee = list(random_small_vec_gen(3*k,r))
+    e0 = R(ee[0:k])
+    e1 = R(ee[k:2*k])
+    e = R(ee[2*k:3*k])
+    c0 = e + Public_Key[0] * e1
+    c1 = e0 + Public_Key[1] * e1
+    E = vector_space(ee)
+    E_string = "".join(map(str,list(E.basis_matrix())))
+    return c0,c1,hashlib.sha256(E_string.encode()).hexdigest()
+
+Public_Key = Key_List[2:4]
+%time Encapsulation_Key_List = ROLLOIII_Encap(q,m,n,k,r,d,Public_Key)
+
+
+def ROLLOIII_Decap(q,m,n,k,r,d,Private_Key,Ciphertext):  
+    F_list = vector_to_basis_list(Private_Key)
+    slist = list(Ciphertext[0] - Private_Key*Ciphertext[1])
+    S_list = vector_to_basis_list(slist)
+    E_test = find_E(S_list,F_list)
+    E_test_string = "".join(map(str,list(E_test.basis_matrix())))
+    return hashlib.sha256(E_test_string.encode()).hexdigest()
+
+Private_Key = Key_List[0]; Ciphertext = Encapsulation_Key_List[0:2]
+%time Key_test = ROLLOIII_Decap(q,m,n,k,r,d,Private_Key,Ciphertext)
+
+# check correctness
+Key_test == Encapsulation_Key_List[2]
+
