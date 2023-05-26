@@ -103,10 +103,6 @@ Public_Key = Key_List[2]
 
 
 def ROLLOI_Decap(q,m,n,k,r,d,Private_Key,Ciphertext):  
-    #H1 = ideal_matrix(Private_key[0]).transpose()
-    #H2 = ideal_matrix(Private_key[1]).transpose()
-    #H = block_matrix(1,2,[H1,H2])
-    #F_list = H_to_basis_list(H1)
     xlist = list(Private_Key[0])
     F_list = vector_to_basis_list(xlist)
     slist = list(Private_Key[0]*Ciphertext)
@@ -137,7 +133,6 @@ import hashlib
 #(q,m,n,k,r,d)=(2,101,2*191,191,7,9) #  192
 #(q,m,n,k,r,d)=(2,97,2*211,211,7,11) #  256
 
-# 将十六进制哈希值转化成二进制字符串，比 “b1 = bin(int(Hex_str,16))[2:] ” 转化的更准确
 def Hexadecimal_to_Binary(Hex_str): 
     bin_str = ""
     for i in Hex_str:
@@ -150,7 +145,7 @@ P.<XX> = Fqm[]
 R.<X> = P.quotient(P1)
 
 digest = hashlib.sha256().hexdigest()
-lamda = len(Hexadecimal_to_Binary(digest)) # 计算 hashlib.sha256() 的输出长度
+lamda = len(Hexadecimal_to_Binary(digest)) 
 
 
 # Key Generation
@@ -172,7 +167,6 @@ def ROLLOII_Enc(q,m,n,k,r,d,Public_Key,Message):
     c = e1 + Public_Key * e2
     hash1 = hashlib.sha256(E_string.encode()).hexdigest()
     b1 = Hexadecimal_to_Binary(hash1)
-    #b1 = bin(int(hash1,16))[2:]  # [2:]删去二进制串前面的0b,删去后是长度256比特的二进制串
     b1_list = [Fqm(b1[i]) for i in range(lamda)]
     return c,vector(Fqm.base_ring(),b1_list) + Message
 
@@ -189,7 +183,6 @@ def ROLLOII_Dec(q,m,n,k,r,d,Private_Key,Ciphertext):
     E_test_string = "".join(map(str,list(E_test.basis_matrix())))
     hash2 = hashlib.sha256(E_test_string.encode()).hexdigest()
     b2 = Hexadecimal_to_Binary(hash2)
-    #b2 = bin(int(hash2,16))[2:]
     b2_list = [Fqm(b2[i]) for i in range(lamda)]
     return vector(Fqm.base_ring(),b2_list) + Ciphertext[1]
 
