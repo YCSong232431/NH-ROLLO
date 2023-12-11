@@ -65,10 +65,15 @@ def find_E(S_list, F_list):
 ----------------------------------------------------------------------------------------------------------------
 
 
-# Blockwise-ROLLO-I
-#(q,m,n,n1,n2,r1,r2,d1,d2) = (2,61,134,67,67,4,4,5,4) # NH-ROLLO-I-128
-#(q,m,n,n1,n2,r1,r2,d1,d2) = (2,71,158,79,79,5,5,5,5) # NH-ROLLO-I-192
-#(q,m,n,n1,n2,r1,r2,d1,d2) = (2,79,178,89,89,5,5,6,5) # NH-ROLLO-I-256
+# Blockwise_ROLLO_I
+#(q,m,n,n1,n2,r1,r2,d1,d2) = (2,61,134,67,67,4,4,5,4) # Blockwise_ROLLO_I - 128
+#(q,m,n,n1,n2,r1,r2,d1,d2) = (2,71,158,79,79,5,5,5,5) # Blockwise_ROLLO_I - 192
+#(q,m,n,n1,n2,r1,r2,d1,d2) = (2,79,178,89,89,5,5,6,5) # Blockwise_ROLLO_I -256
+
+# Updated Blockwise_ROLLO_I
+#(q,m,n,n1,n2,r1,r2,d1,d2) = (2,61,2*67,67,67,4,4,5,5) # Blockwise_ROLLO_I - 128
+#(q,m,n,n1,n2,r1,r2,d1,d2) = (2,79,2*89,89,89,5,5,5,6) # Blockwise_ROLLO_I - 192
+#(q,m,n,n1,n2,r1,r2,d1,d2) = (2,79,2*97,97,97,5,5,6,6) # Blockwise_ROLLO_I -256
 
 import hashlib
 Fqm = GF(q**m)
@@ -77,26 +82,28 @@ P.<XX> = Fqm[]
 R.<X> = P.quotient(P1)
 
 # Key Generation
-def NHROLLOI_KGen(q,m,n,n1,n2,r1,r2,d1,d2):
+def Blockwise_ROLLO_I_KGen(q,m,n,n1,n2,r1,r2,d1,d2):
     x = R(list(random_small_vec_gen(n1,d1)))
     y = R(list(random_small_vec_gen(n1,d2)))
     h = x**(-1) * y
     return x,y,h
 
-%time Key_List = NHROLLOI_KGen(q,m,n,n1,n2,r1,r2,d1,d2)
+%time Key_List = Blockwise_ROLLO_I_KGen(q,m,n,n1,n2,r1,r2,d1,d2)
 
-def NHROLLOI_Encap(q,m,n,n1,n2,r1,r2,d1,d2,Public_Key):  
+# Encapsulation
+def Blockwise_ROLLO_I_Encap(Public_Key):  
     e1 = R(list(random_small_vec_gen(n1,r1)))
     e2 = R(list(random_small_vec_gen(n1,r2)))
     E = vector_space(list(e1)+list(e2))
-    E_string = "".join(map(str,list(E.basis_matrix())))
+    E_string = "".join(map(str,list(E.basis_matrix()))) # list(E.basis_matrix()) can be replace by E.basis_matrix().list()
     c = e1 + Public_Key * e2
     return c,hashlib.sha256(E_string.encode()).hexdigest()
 
 Public_Key = Key_List[2]
-%time Encapsulation_Key_List = NHROLLOI_Encap(q,m,n,n1,n2,r1,r2,d1,d2,Public_Key)
+%time Encapsulation_Key_List = Blockwise_ROLLO_I_Encap(Public_Key)
 
-def NHROLLOI_Decap(q,m,n,n1,n2,r1,r2,d1,d2,Private_Key,Ciphertext):  
+# Decapsulation 
+def Blockwise_ROLLO_I_Decap(Private_Key,Ciphertext):  
     xlist = list(Private_Key[0])
     ylist = list(Private_Key[1])
     F1_list = vector_to_basis_list(xlist)
@@ -108,17 +115,18 @@ def NHROLLOI_Decap(q,m,n,n1,n2,r1,r2,d1,d2,Private_Key,Ciphertext):
     return hashlib.sha256(E_test_string.encode()).hexdigest()
 
 Private_Key = Key_List[0:2]; Ciphertext = Encapsulation_Key_List[0]
-%time Key_test = NHROLLOI_Decap(q,m,n,n1,n2,r1,r2,d1,d2,Private_Key,Ciphertext)
+%time Key_test = Blockwise_ROLLO_I_Decap(Private_Key,Ciphertext)
 
 # Check Correctness
 Key_test == Encapsulation_Key_List[1]
 
 --------------------------------------------------------------------------------------------------------------
 
-# Blockwise-ROLLO-II
+# Blockwise_ROLLO_II
 
 import hashlib
 
+# This function turns Hexadecimal into Binary
 def Hexadecimal_to_Binary(Hex_str): 
     bin_str = ""
     for i in Hex_str:
@@ -126,12 +134,17 @@ def Hexadecimal_to_Binary(Hex_str):
     return bin_str
 
 digest = hashlib.sha256().hexdigest()
-lamda = len(Hexadecimal_to_Binary(digest)) 
+lamda = len(Hexadecimal_to_Binary(digest)) # the output length of  hashlib.sha256()
 
+# Blockwise_ROLLO_II
+#(q,m,n,n1,n2,r1,r2,d1,d2) = (2,89,2*163,163,163,4,4,4,4) # Blockwise_ROLLO_II-128
+#(q,m,n,n1,n2,r1,r2,d1,d2) = (2,97,2*179,179,179,4,5,5,5) # Blockwise_ROLLO_II-192
+#(q,m,n,n1,n2,r1,r2,d1,d2) = (2,101,2*181,181,181,5,5,5,5) # Blockwise_ROLLO_II-256
 
-#(q,m,n,n1,n2,r1,r2,d1,d2) = (2,89,2*163,163,163,4,4,4,4) # NH-ROLLO-II-128
-#(q,m,n,n1,n2,r1,r2,d1,d2) = (2,97,2*179,179,179,4,5,5,5) # NH-ROLLO-II-192
-#(q,m,n,n1,n2,r1,r2,d1,d2) = (2,101,2*181,181,181,5,5,5,5) # NH-ROLLO-II-256
+# Updated Blockwise_ROLLO_II
+#(q,m,n,n1,n2,r1,r2,d1,d2) = (2,89,2*163,163,163,4,4,5,5) # Blockwise_ROLLO_II - 128
+#(q,m,n,n1,n2,r1,r2,d1,d2) = (2,97,2*179,179,179,4,5,5,6) # Blockwise_ROLLO_II - 192
+(q,m,n,n1,n2,r1,r2,d1,d2) = (2,101,2*191,191,191,5,5,5,6) # Blockwise_ROLLO_II -256
 
 Fqm = GF(q^m)
 P1  = GF(q)['XX'].irreducible_element(n1, algorithm="minimal_weight")
@@ -139,31 +152,35 @@ P.<XX> = Fqm[]
 R.<X> = P.quotient(P1)
 
 # Key Generation
-def NHROLLOII_KGen(q,m,n,n1,n2,r1,r2,d1,d2):
+def Blockwise_ROLLO_II_KGen(q,m,n,n1,n2,r1,r2,d1,d2):
     x = R(list(random_small_vec_gen(n1,d1)))
     y = R(list(random_small_vec_gen(n1,d2)))
     h = x**(-1) * y
     return x,y,h
 
-%time Key_List = NHROLLOII_KGen(q,m,n,n1,n2,r1,r2,d1,d2)
+%time Key_List = Blockwise_ROLLO_II_KGen(q,m,n,n1,n2,r1,r2,d1,d2)
 
-
-def NHROLLOII_Enc(q,m,n,n1,n2,r1,r2,d1,d2,Public_Key,Message):  
+# Encryption
+def Blockwise_ROLLO_II_Enc(Public_Key,Message):  
     e1 = R(list(random_small_vec_gen(n1,r1)))
     e2 = R(list(random_small_vec_gen(n1,r2)))
     E = vector_space(list(e1)+list(e2))
     E_string = "".join(map(str,list(E.basis_matrix())))
     hash1 = hashlib.sha256(E_string.encode()).hexdigest()
     b1 = Hexadecimal_to_Binary(hash1)
+    #b1 = bin(int(hash1,16))[2:]  # [2:]删去二进制串前面的0b,删去后是长度256比特的二进制串
     b1_list = [Fqm(b1[i]) for i in range(lamda)]
     c = e1 + Public_Key * e2
     return c,vector(Fqm.base_ring(),b1_list) + Message
 
 Public_Key = Key_List[2]; Message = random_vector(Fqm.base_ring(),lamda)
-%time Ciphertext_List = NHROLLOII_Enc(q,m,n,n1,n2,r1,r2,d1,d2,Public_Key,Message)
+%time Ciphertext_List = Blockwise_ROLLO_II_Enc(Public_Key,Message)
 
-
-def NHROLLOII_Dec(q,m,n,n1,n2,r1,r2,d1,d2,Private_Key,Ciphertext):  
+# Decryption
+def Blockwise_ROLLO_II_Dec(Private_Key,Ciphertext):  
+    #H1 = ideal_matrix(Private_key[0]).transpose()
+    #H2 = ideal_matrix(Private_key[1]).transpose()
+    #H = block_matrix(1,2,[H1,H2])
     xlist = list(Private_Key[0])
     ylist = list(Private_Key[1])
     F1_list = vector_to_basis_list(xlist)
@@ -174,11 +191,12 @@ def NHROLLOII_Dec(q,m,n,n1,n2,r1,r2,d1,d2,Private_Key,Ciphertext):
     E_test_string = "".join(map(str,list(E_test.basis_matrix())))
     hash2 = hashlib.sha256(E_test_string.encode()).hexdigest()
     b2 = Hexadecimal_to_Binary(hash2)
+    #b2 = bin(int(hash2,16))[2:]
     b2_list = [Fqm(b2[i]) for i in range(lamda)]
     return vector(Fqm.base_ring(),b2_list) + Ciphertext[1]
 
 Private_Key = Key_List[0:2]; Ciphertext = Ciphertext_List
-%time Message_test = NHROLLOII_Dec(q,m,n,n1,n2,r1,r2,d1,d2,Private_Key,Ciphertext)
+%time Message_test = Blockwise_ROLLO_II_Dec(Private_Key,Ciphertext)
 
 # check correctness
 Message_test == Message
@@ -186,11 +204,11 @@ Message_test == Message
 --------------------------------------------------------------------------------
 
 
-# Blockwise-ROLLO-III
+# Blockwise_ROLLO_III
 
-#(q,m,n,n1,n2,n3,r1,r2,r3,d1,d2) = (2,53,3*79,79,79,79,4,4,5,4,4) # NH-ROLLO-III-128
-#(q,m,n,n1,n2,n3,r1,r2,r3,d1,d2) = (2,89,3*101,101,101,101,6,6,6,4,5) # NH-ROLLO-III-192
-#(q,m,n,n1,n2,n3,r1,r2,r3,d1,d2) = (2,97,3*103,103,103,103,6,6,7,5,5) # NH-ROLLO-III-256
+#(q,m,n,n1,n2,n3,r1,r2,r3,d1,d2) = (2,53,3*79,79,79,79,4,4,5,4,4) # Blockwise_ROLLO_III-128
+#(q,m,n,n1,n2,n3,r1,r2,r3,d1,d2) = (2,89,3*101,101,101,101,6,6,6,4,5) # Blockwise_ROLLO_III-192
+(q,m,n,n1,n2,n3,r1,r2,r3,d1,d2) = (2,97,3*103,103,103,103,6,6,7,5,5) # Blockwise_ROLLO_III-256
 
 import hashlib
 Fqm = GF(q^m)
@@ -199,17 +217,17 @@ P.<XX> = Fqm[]
 R.<X> = P.quotient(P1)
 
 # Key Generation
-def NHROLLOIII_KGen(q,m,n,n1,n2,n3,r1,r2,r3,d1,d2):
+def Blockwise_ROLLO_III_KGen(q,m,n,n1,n2,n3,r1,r2,r3,d1,d2):
     f1 = R.random_element()
     h0 = R(list(random_small_vec_gen(n1,d1)))
     h1 = R(list(random_small_vec_gen(n1,d2)))
     f0 = h1 + h0*f1
     return h0,h1,f0,f1
 
-%time Key_List = NHROLLOIII_KGen(q,m,n,n1,n2,n3,r1,r2,r3,d1,d2)
+%time Key_List = Blockwise_ROLLO_III_KGen(q,m,n,n1,n2,n3,r1,r2,r3,d1,d2)
 
-
-def NHROLLOIII_Encap(q,m,n,n1,n2,n3,r1,r2,r3,d1,d2,Public_Key):
+# Encapsulation 
+def Blockwise_ROLLO_III_Encap(Public_Key):
     e0 = R(list(random_small_vec_gen(n1,r1)))
     e1 = R(list(random_small_vec_gen(n1,r2)))
     e = R(list(random_small_vec_gen(n1,r3)))
@@ -220,9 +238,10 @@ def NHROLLOIII_Encap(q,m,n,n1,n2,n3,r1,r2,r3,d1,d2,Public_Key):
     return c0,c1,hashlib.sha256(E_string.encode()).hexdigest()
 
 Public_Key = Key_List[2:4]
-%time Encapsulation_Key_List = NHROLLOIII_Encap(q,m,n,n1,n2,n3,r1,r2,r3,d1,d2,Public_Key)
+%time Encapsulation_Key_List = Blockwise_ROLLO_III_Encap(Public_Key)
 
-def NHROLLOIII_Decap(q,m,n,n1,n2,n3,r1,r2,r3,d1,d2,Private_Key,Ciphertext):  
+# Decapsulation 
+def Blockwise_ROLLO_III_Decap(Private_Key,Ciphertext):  
     h0_list = list(Private_Key[0])
     h1_list = list(Private_Key[1])
     F1_list = vector_to_basis_list(h0_list)
@@ -234,10 +253,9 @@ def NHROLLOIII_Decap(q,m,n,n1,n2,n3,r1,r2,r3,d1,d2,Private_Key,Ciphertext):
     return hashlib.sha256(E_test_string.encode()).hexdigest()
 
 Private_Key = Key_List[0:2]; Ciphertext = Encapsulation_Key_List[0:2]
-%time Key_test = NHROLLOIII_Decap(q,m,n,n1,n2,n3,r1,r2,r3,d1,d2,Private_Key,Ciphertext)
+%time Key_test = Blockwise_ROLLO_III_Decap(Private_Key,Ciphertext)
 
-# check correctness
+# Check correctness
 Key_test == Encapsulation_Key_List[2]
-
 
 
