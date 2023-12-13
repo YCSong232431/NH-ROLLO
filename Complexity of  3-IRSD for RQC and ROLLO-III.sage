@@ -88,7 +88,8 @@ def WF4(m,n,k,r1,r2,r3): # The complexity of underdetermined case
 # w : the exponent of matrix multiplication 2 <= w <= 3 and a practical value is 2.81
 
 # Our RQC; n1 = n2 = n3 = n/3, k = n/3
-#(q,m,n,k,r1,r2,r3,w)= (2,83,3*79,79,4,4,4,2.81) #  3-IRSD(3n)  128,   p= 40,    WF = 163   
+#(q,m,n,k,r1,r2,r3,w)= (2,83,3*79,79,4,4,4,2.81) #  3-IRSD(3n)  128,   p= 40,    WF = 163
+#(q,m,n,k,r1,r2,r3,w)= (2,101,3*97,97,4,5,4,2.81)  #  3-IRSD(3n)  128,   p= 55 ,    WF = 182 
 #(q,m,n,k,r1,r2,r3,w)= (2,127,3*113,113,5,5,5,2.81) #  3-IRSD(3n)  192,   p = 57 ,    WF = 214
 #(q,m,n,k,r1,r2,r3,w)= (2,139,3*137,137,6,6,7,2.81) #  3-IRSD(3n)  256,   p = 5,    WF = 288
 
