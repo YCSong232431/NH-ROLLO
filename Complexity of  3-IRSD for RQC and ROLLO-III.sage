@@ -3,6 +3,7 @@
 # The MM modeling for the two Blockwise Rank Syndrome Decoding (3-RSD) Problem
 
 from itertools import combinations, combinations_with_replacement
+import math
 
 def Equations_p(m,n,k,r1,r2,r3,p):  # the maximal  number of equations   
     return m*binomial(n-k-p-1,r1+r2+r3)
@@ -11,7 +12,7 @@ def Unkonwns_a_p(m,n,k,r1,r2,r3,a1,a2,a3,p): # the number of unkonwns
     result = binomial(n/3-a1,r1)* binomial(n/3-a2,r2) * binomial(n/3-a3-p,r3)-1
     return result
 
-def Equations_Rate_Unkonwns(m,n,k,r1,r2,r3,a1,a2,a3,p):  # If < 1,  equations < unkonwns，underdetermined case
+def Equations_Rate_Unkonwns(m,n,k,r1,r2,r3,a1,a2,a3,p):  # If < 1, equations < unkonwns，underdetermined case
     result = Equations_p(m,n,k,r1,r2,r3,p)/Unkonwns_a_p(m,n,k,r1,r2,r3,a1,a2,a3,p) 
     return result
 
@@ -36,7 +37,7 @@ def a_tuples(m,n,k,r1,r2,r3):
 def WF1(m,n,k,r1,r2,r3,p):  # The complexity of overdetemined case if one knowns p
     U = Unkonwns_a_p(m,n,k,r1,r2,r3,0,0,0,p)
     E = Equations_p(m,n,k,r1,r2,r3,p) 
-    WF = log(E,2) + (w-1)*log(U,2) 
+    WF = math.log(E,2) + (w-1) * math.log(U,2) 
     return WF
 
 def WF2(m,n,k,r1,r2,r3):  # The complexity of overdetemined case 
@@ -47,7 +48,7 @@ def WF2(m,n,k,r1,r2,r3):  # The complexity of overdetemined case
         p = list_p[i]
         U = Unkonwns_a_p(m,n,k,r1,r2,r3,0,0,0,p)
         E = Equations_p(m,n,k,r1,r2,r3,p) 
-        WF = log(E,2) + (w-1)*log(U,2)
+        WF = math.log(E,2) + (w-1)*math.log(U,2)
         p_WF[p] = float(WF)
         v = Equations_Rate_Unkonwns(m,n,k,r1,r2,r3,0,0,0,p)
         Rate_list.append(round(v,4))
@@ -60,7 +61,7 @@ def WF2(m,n,k,r1,r2,r3):  # The complexity of overdetemined case
 def WF3(m,n,k,r1,r2,r3,a1,a2,a3): # The complexity of underdetermined case if one knowns a1, a2, a3 
     U = Unkonwns_a_p(m,n,k,r1,r2,r3,a1,a2,a3,0)
     E = Equations_p(m,n,k,r1,r2,r3,0) 
-    WF = log(E,2) + (w-1)*log(U,2) + (a1*r1 + a2*r2 + a3*r3)
+    WF = math.log(E,2) + (w-1) * math.log(U,2) + (a1*r1 + a2*r2 + a3*r3)
     return WF
 
 def WF4(m,n,k,r1,r2,r3): # The complexity of underdetermined case
@@ -73,7 +74,7 @@ def WF4(m,n,k,r1,r2,r3): # The complexity of underdetermined case
         a2 = list_a[i][1]
         a3 = list_a[i][2]
         U = Unkonwns_a_p(m,n,k,r1,r2,r3,a1,a2,a3,0)
-        WF = log(E,2) + (w-1)*log(U,2) + (a1*r1 + a2*r2 + a3*r3)
+        WF = math.log(E,2) + (w-1)* math.log(U,2) + (a1*r1 + a2*r2 + a3*r3)
         a_WF[list_a[i]] = round(WF,4)
         v = Equations_Rate_Unkonwns(m,n,k,r1,r2,r3,a1,a2,a3,0)
         Rate_list.append(round(v,4))
@@ -87,18 +88,15 @@ def WF4(m,n,k,r1,r2,r3): # The complexity of underdetermined case
 # w : the exponent of matrix multiplication 2 <= w <= 3 and a practical value is 2.81
 
 # Our RQC; n1 = n2 = n3 = n/3, k = n/3
-(q,m,n,k,r1,r2,r3,w)= (2,83,3*79,79,4,4,4,2.81) #  3-IRSD(3n)  128,    p= 40,    WF = 163 
-#(q,m,n,k,r1,r2,r3,w)= (2,101,3*97,97,4,5,4,2.81)  #  3-IRSD(3n)  128,    p= 55 ,    WF = 182   
-#(q,m,n,k,r1,r2,r3,w)= (2,127,3*113,113,5,5,5,2.81) #  3-IRSD(3n)  192,    p = 57 ,    WF = 214
-#(q,m,n,k,r1,r2,r3,w)= (2,139,3*137,137,6,6,6,2.81) #  3-IRSD(3n)  256,    p = 19,    WF = 274
-# p = 99 is a strange value 
+#(q,m,n,k,r1,r2,r3,w)= (2,83,3*79,79,4,4,4,2.81) #  3-IRSD(3n)  128,   p= 40,    WF = 163   
+#(q,m,n,k,r1,r2,r3,w)= (2,127,3*113,113,5,5,5,2.81) #  3-IRSD(3n)  192,   p = 57 ,    WF = 214
+#(q,m,n,k,r1,r2,r3,w)= (2,139,3*137,137,6,6,7,2.81) #  3-IRSD(3n)  256,   p = 5,    WF = 288
+
 
 # Our Rollo-III Ourobors; DFR is around 2**(-30); n1 = n2 = n3 = n/3, k = n/3
-#(q,m,n,k,r1,r2,r3,w)= (2,59,3*79,79,4,4,5,2.81) #  3-IRSD(3n)  # 128,     p = 31,   WF = 175
-#(q,m,n,k,r1,r2,r3,w)= (2,89,3*101,101,6,6,6,2.81) #  3-IRSD(3n)  # 192,   a1 = a2 = 0; a3 = 2,    WF = 266
-#(q,m,n,k,r1,r2,r3,w)= (2,97,3*103,103,6,6,7,2.81) #  3-IRSD(3n)  # 256,   a1 = a2 = a3 = 2,    WF = 304
-#(q,m,n,k,r1,r2,r3,w)= (2,97,3*109,109,6,6,7,2.81) #  3-IRSD(3n)  # 256,    a1 = a2 = 0; a3 = 5,  WF = 305
-
+#(q,m,n,k,r1,r2,r3,w)= (2,59,3*79,79,4,4,5,2.81) #  3-IRSD(3n)  # 128     p = 31,   WF = 175
+#(q,m,n,k,r1,r2,r3,w)= (2,89,3*101,101,6,6,6,2.81) #  3-IRSD(3n)  # 192   a1 = a2 = 0; a3 = 2,    WF = 266
+#(q,m,n,k,r1,r2,r3,w)= (2,97,3*109,109,6,6,7,2.81) #  3-IRSD(3n)  # 256    a1 = a2 = 0; a3 = 5,  WF = 305
 
 
 print("Observe the Rate of Equations and Unkonwns:")
