@@ -94,6 +94,7 @@ def WF4(m,n,k,r1,r2): # The complexity of underdetermined case
 
 
 # Our Rollo-III Ourobors; DFR is around 2**(-30); n1 = n2 = n/2, k = n/2
+#(q,m,n,k,r1,r2,w)= (2,59,2*79,79,4,4,2.81) # 2-IRSD(2n)  # 128     a1 = 0, a2 = 9,   WF = 149
 #(q,m,n,k,r1,r2,w)= (2,59,2*73,73,4,4,2.81) # 2-IRSD(2n)  # 128     a1 = 4, a2 = 5,   WF = 147
 # (q,m,n,k,r1,r2,w)= (2,89,2*101,101,4,5,2.81) # 2-IRSD(2n)  # 192   a1 = 3 = a2 = 10,   WF = 195
 # (q,m,n,k,r1,r2,w)= (2,97,2*103,103,5,5,2.81) # 2-IRSD(2n)  # 256   a1 = 3, a2 = 21,   WF =  263
