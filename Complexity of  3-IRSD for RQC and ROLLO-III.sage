@@ -1,6 +1,6 @@
 # Parameters of RQC and ROLLO-III for the 3-IRSD Problem
 # Algebric method ---- MM modeling without Grobner basis  
-# The MM modeling for the two Blockwise Rank Syndrome Decoding (3-RSD) Problem
+# The MM modeling for the three Blockwise Rank Syndrome Decoding (3-RSD) Problem
 
 from itertools import combinations, combinations_with_replacement
 import math
