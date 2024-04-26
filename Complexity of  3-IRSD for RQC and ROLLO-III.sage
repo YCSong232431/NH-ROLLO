@@ -1,4 +1,4 @@
-# Complexities of 3-IRSD Problem for RQC and ROLLO-III
+# Complexities of 3-IRSD problem for RQC and ROLLO-III
 # Algebric method ---- MM modeling without Grobner basis  
 # The MM modeling for the three Blockwise Rank Syndrome Decoding (3-RSD) Problem
 
