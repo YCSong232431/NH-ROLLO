@@ -1,4 +1,4 @@
-# Parameters of RQC, ROLLO-I, ROLLO-II, and Ouroboros for the 2-IRSD Problem
+# Complexities of 2-IRSD Problem for RQC and ROLLO
 # Algebric method ---- MM modeling without Grobner basis  
 # The MM modeling for the 2-RSD Problem
 
