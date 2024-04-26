@@ -1,6 +1,6 @@
-# Parameters of ROLLO-I and ROLLO-II for the 2-IRSD Problem
+# Parameters of RQC, ROLLO-I, ROLLO-II, and Ouroboros for the 2-IRSD Problem
 # Algebric method ---- MM modeling without Grobner basis  
-# The MM modeling for the two Blockwise Rank Syndrome Decoding (2-RSD) Problem
+# The MM modeling for the 2-RSD Problem
 
 from itertools import combinations, combinations_with_replacement
 import math
@@ -87,66 +87,17 @@ def WF4(m,n,k,n1,n2,r1,r2): # The complexity of underdetermined case
 # m: extension degree; n: code_length, k: code_dimension; 
 # w : the exponent of matrix multiplication 2 <= w <= 3 and a practical value is 2.81
 
-# Our ROLLO-I  Lake;  DFR is around 2**(-30); 
-# Message attack: c = e1 + h.e2; n1 = n2 = n/2
-#(q,m,n,k,n1,n2,r1,r2,w)= (2,61,2*67,67,67,67,4,4,2.81) # 128    a1 = 0, a2 = 8,     WF = 140
-#(q,m,n,k,n1,n2,r1,r2,w)= (2,71,2*79,79,79,79,5,5,2.81) # 192    a1 = 1, a2 = 22,      WF = 245
-#(q,m,n,k,n1,n2,r1,r2,w)= (2,79,2*89,89,89,89,5,5,2.81) # 256    a1 = 7;  a2 = 18,        WF = 261
 
-# Our ROLLO-I  Lake; Structural attack using the complexity of plain LRPC attack
-# Structural Attack on subcodes  (0 = y - h.x): (m,n-v,n-k-v,d1,d2), v = \floor((n-k)/(d1+d2)) 
-#(q,m,n,k,n1,n2,r1,r2,w)= (2,61,2*67-7,67-7,67-7,67,5,4,2.81) # 128     a1 = 2, a2 = 7,  WF = 153
-#(q,m,n,k,n1,n2,r1,r2,w)= (2,71,2*79-7,79-7,79-7,79,5,5,2.81) #  192    a1 = 5, a2 = 13,  WF = 220
-#(q,m,n,k,n1,n2,r1,r2,w)= (2,79,2*89-8,89-8,89-8,89,6,5,2.81) # 256     a1 = 9, a2 = 15,  WF = 273
+# Our RQC, 2-IRSD: n1 = n2 = n/2, k = n/2
+#(q,m,n,k,n1,n2,r1,r2,w)= (2,83,79*2,79,79,79,4,4,2.81) # 128    a1 = 1， a2 = 2,   WF = 127
+#(q,m,n,k,n1,n2,r1,r2,w)= (2,127,113*2,113,113,113,5,5,2.81)  # 192   a1 = 5，a2 = 16,   WF = 253
+#(q,m,n,k,n1,n2,r1,r2,w)= (2,139,137*2,137,137,137,5,5,2.81)  # 256   a1 = 5, a2 = 17,   WF = 267
 
-# Our ROLLO-I  Lake; Structural attack using the complexity of the new 2-LRPC attack
-# Shortening and Truncating approach
-# (0 = y - h.x): (m,n-v,n-k-v,d1,d2), v = \floor((n-k)/(min(d1,d2))
-#(q,m,n,k,n1,n2,r1,r2,w)= (2,61,2*67-16,67-16,67,67-16,5,4,2.81) # 128    a1 = 0, a2 = 1,  WF = 119
-#(q,m,n,k,n1,n2,r1,r2,w)= (2,71,2*79-15,79-15,79-15,79,5,5,2.81) # 192    a1 = 4, a2 = 5,  WF = 175
-#(q,m,n,k,n1,n2,r1,r2,w)= (2,79,2*89-17,89-17,89,89-17,6,5,2.81) # 256    a1 = 2, a2 = 13, WF = 221
-
-
-# Our Updated  ROLLO-I  Lake, DFR is around 2**(-30);
+# Our ROLLO-I  Lake, DFR is around 2**(-30);
+# Message attack: c = e1 + h.e2; n1 = n2 = n/2, k = n/2
 #(q,m,n,k,n1,n2,r1,r2,w)= (2,59,2*67,67,67,67,4,4,2.81) # 128    a1 = 4, a2 = 5,     WF = 144
 #(q,m,n,k,n1,n2,r1,r2,w)= (2,79,2*89,89,89,89,5,5,2.81) # 192    a1 = 7,  a2 = 18,  WF = 261
 #(q,m,n,k,n1,n2,r1,r2,w)= (2,79,2*97,97,97,97,5,5,2.81) # 256    a1 = 10, a2 = 17,  WF = 275
-
-# Our Updated  ROLLO-I  Lake:
-# Structural Attack on subcodes  (0 = y - h.x): (m,n-v,n-k-v,d1,d2), v = \floor((n-k)/(d1+d2)) 
-#(q,m,n,k,n1,n2,r1,r2,w)= (2,59,2*67-6,67-6,67-6,67,5,5,2.81) # 128     a1 = 6, a2 = 12,  WF = 212
-#(q,m,n,k,n1,n2,r1,r2,w)= (2,79,2*89-8,89-8,89-8,89,5,6,2.81) #  192    a1 = 7, a2 = 17,  WF = 281
-#(q,m,n,k,n1,n2,r1,r2,w)= (2,79,2*97-8,97-8,97-8,97,6,6,2.81) # 256     a1 = 1, a2 = 31,  WF = 348
-
-# Our Updated  ROLLO-I  Lake: 
-# Structural attack using the complexity of the new 2-LRPC attack
-# Shortening and Truncating approach
-# (0 = y - h.x): (m,n-v,n-k-v,d1,d2), v = \floor((n-k)/(min(d1,d2))
-#(q,m,n,k,n1,n2,r1,r2,w)= (2,59,2*67-13,67-13,67-13,67,5,5,2.81) # 128     a1 = 5, a2 = 5,  WF = 172
-#(q,m,n,k,n1,n2,r1,r2,w)= (2,79,2*89-17,89-17,89-17,89,5,6,2.81) #  192    a1 = 6, a2 = 10,  WF = 234
-#(q,m,n,k,n1,n2,r1,r2,w)= (2,79,2*97-16,97-16,97-16,97,6,6,2.81) # 256     a1 = 12, a2 = 13,  WF = 306
-
-
-
-# Our ROLLO-II  Locker;  DFR is around 2**(-130); 
-# Message attack: c = e1 + h.e2; n1 = n2 = n/2, k = n/2
-#(q,m,n,k,n1,n2,r1,r2,w)= (2,89,163*2,163,163,163,4,4,2.81) # 128   p = 3,     WF = 139
-#(q,m,n,k,n1,n2,r1,r2,w)= (2,97,179*2,179,179,179,4,5,2.81)  # 192   a1 = 6, a2 = 10,     WF = 229
-#(q,m,n,k,n1,n2,r1,r2,w)= (2,101,181*2,181,181,181,5,5,2.81)  # 256   a1 = 1, a2 = 35,     WF = 347
-
-# Our ROLLO-II  Locker; Structural attack using the complexity of plain LRPC attack
-# Structural Attack on subcodes (0 = y - h.x): (m,n-v,n-k-v,d1,d2), v = \floor((n-k)/(r1+r2))
-#(q,m,n,k,n1,n2,r1,r2,w)= (2,89,163*2-20,163-20,163-20,163,4,4,2.81) # 128     p = 22    135
-# (q,m,n,k,n1,n2,r1,r2,w)= (2,97,179*2-17,179-17,179-17,179,5,5,2.81)  # 192    a1 = 2, a2 = 20,  WF = 276   
-# combination attacks 254
-#(q,m,n,k,n1,n2,r1,r2,w)= (2,101,181*2-18,181-18,181-18,181,5,5,2.81)  # 256     a1 = 1, a2 = 19, WF = 267
-
-# Our ROLLO-II  Locker; Structural attack using the complexity of the new 2-LRPC attack
-# Shortening and Truncating approach
-# (0 = y - h.x): (m,n-v,n-k-v,d1,d2), v = \floor((n-k)/(min(d1,d2))
-#(q,m,n,k,n1,n2,r1,r2,w)= (2,89,163*2-40,163-40,163-40,163,4,4,2.81) # 128     p = 41,    WF = 130
-#(q,m,n,k,n1,n2,r1,r2,w)= (2,97,179*2-35,179-35,179-35,179,5,5,2.81)  # 192   a1 = 0, a2 = 2,  WF = 176   
-#(q,m,n,k,n1,n2,r1,r2,w)= (2,101,181*2-36,181-36,181-36,181,5,5,2.81)  # 256   p = 0, WF = 167
 
 
 # Our Updated ROLLO-II  Locker;  DFR is around 2**(-130); 
@@ -155,19 +106,11 @@ def WF4(m,n,k,n1,n2,r1,r2): # The complexity of underdetermined case
 #(q,m,n,k,n1,n2,r1,r2,w)= (2,97,179*2,179,179,179,4,5,2.81)  # 192   a1 = 6, a2 = 10,     WF = 229
 #(q,m,n,k,n1,n2,r1,r2,w)= (2,101,191*2,191,191,191,5,5,2.81)  # 256   a1 = 3, a2 = 35,     WF = 359
 
-# Our Updated ROLLO-II  Locker: Structural attack using the complexity of plain LRPC attack
-#(q,m,n,k,n1,n2,r1,r2,w)= (2,83,173*2-17,173-17,173-17,173,5,5,2.81) # 128   a1 = 11, a2 = 14,  WF = 289
-#(q,m,n,k,n1,n2,r1,r2,w)= (2,97,179*2-16,179-16,179-16,179,5,6,2.81)  # 192    a1 = 9, a2 = 28,  WF = 390   
-#(q,m,n,k,n1,n2,r1,r2,w)= (2,101,191*2-17,191-17,191-17,191,5,6,2.81)  # 256     a1 = 9, a2 = 29, WF = 400
 
-# Our Updated ROLLO-II  Locker: Shortening and Truncating approach
-# Structural attack using the complexity of the new 2-LRPC attack
-# (0 = y - h.x): (m,n-v,n-k-v,d1,d2), v = \floor((n-k)/(min(d1,d2))
-# (q,m,n,k,n1,n2,r1,r2,w)= (2,83,173*2-34,173-34,173-34,173,5,5,2.81) # 128   a1 = 1, a2 = 6,  WF = 199
-#(q,m,n,k,n1,n2,r1,r2,w)= (2,97,179*2-35,179-35,179-35,179,5,6,2.81)  # 192    a1 = 6, a2 = 14,  WF = 291
-#(q,m,n,k,n1,n2,r1,r2,w)= (2,101,191*2-38,191-38,191-38,191,5,6,2.81)  # 256     a1 = 5, a2 = 14, WF = 290
-
-
+# Our Rollo-III Ouroboros; DFR is around 2**(-30); n1 = n2 = n/2, k = n/2
+#(q,m,n,k,n1,n2,r1,r2,w)= (2,59,73*2,73,73,73,4,4,2.81) # 128    a1 = 4, a2 = 5,   WF = 147
+#(q,m,n,k,n1,n2,r1,r2,w)= (2,89,101*2,101,101,101,4,5,2.81)  # 192   a1 = 3 = a2 = 10,   WF = 195
+#(q,m,n,k,n1,n2,r1,r2,w)= (2,97,109*2,109,109,109,5,5,2.81)  # 256   a1 = 3, a2 = 22,   WF = 270
 
 
 print("Observe the Rate of Equations and Unkonwns:")
